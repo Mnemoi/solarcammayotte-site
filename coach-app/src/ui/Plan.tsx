@@ -2,11 +2,13 @@ import type { AppState } from '../types';
 import { analyzeMorphology, morphologyInsights } from '../engine/morphology';
 import { MUSCLE_LABELS, getExercise } from '../engine/exercises';
 import { currentLoad } from '../engine/coach';
+import { ExerciseDemo, hasDemo } from './ExerciseDemo';
 
 export function Plan({ state }: { state: AppState }) {
   const { profile, program } = state;
   if (!profile || !program) return null;
-  const insights = morphologyInsights(profile, analyzeMorphology(profile));
+  const traits = analyzeMorphology(profile);
+  const insights = morphologyInsights(profile, traits);
 
   return (
     <div className="stack">
@@ -29,6 +31,9 @@ export function Plan({ state }: { state: AppState }) {
                   <strong>{e.name}</strong> <span className="muted">· {MUSCLE_LABELS[e.muscle]}</span><br />
                   {pe.sets} × {pe.repMin}-{pe.repMax}{load > 0 ? ` · ${load} kg` : ''}
                   {pe.note && <p className="note">{pe.note}</p>}
+                  {hasDemo(pe.exerciseId) && (
+                    <details className="demo-details"><summary>Voir le mouvement</summary><ExerciseDemo exerciseId={pe.exerciseId} traits={traits} /></details>
+                  )}
                 </li>
               );
             })}

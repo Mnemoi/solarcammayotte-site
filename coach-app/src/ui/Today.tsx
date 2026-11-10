@@ -3,6 +3,9 @@ import type { AppState, ExerciseLog, PlannedExercise, SessionLog } from '../type
 import { getExercise, isPerDumbbell } from '../engine/exercises';
 import { DELOAD_LOAD_FACTOR, applyDeload, currentLoad, deloadAdvice, roundToStep } from '../engine/coach';
 import type { CompletionResult } from '../App';
+import { analyzeMorphology } from '../engine/morphology';
+import { ExerciseDemo, hasDemo } from './ExerciseDemo';
+import { uid } from '../uid';
 
 interface Props {
   state: AppState;
@@ -74,7 +77,7 @@ export function Today({ state, onComplete }: Props) {
         deload={deload}
         onFinish={(exercises) => {
           const session: SessionLog = {
-            id: crypto.randomUUID(), date: new Date().toISOString(), dayId: day.id, dayName: day.name,
+            id: uid(), date: new Date().toISOString(), dayId: day.id, dayName: day.name,
             readiness, deload, exercises,
           };
           setResult(onComplete(session));
@@ -101,6 +104,7 @@ function Workout({ planned, state, deload, onFinish }: {
     return init;
   });
   const [rir, setRir] = useState<Record<string, number>>({});
+  const traits = useMemo(() => (state.profile ? analyzeMorphology(state.profile) : undefined), [state.profile]);
 
   const update = (id: string, i: number, patch: Partial<SetInput>) =>
     setInputs((s) => ({ ...s, [id]: s[id].map((x, j) => (j === i ? { ...x, ...patch } : x)) }));
@@ -132,6 +136,12 @@ function Workout({ planned, state, deload, onFinish }: {
               {pe.sets} × {pe.repMin}-{pe.repMax} reps · garder {pe.rir} rep(s) en réserve
             </p>
             {pe.note && <p className="note">{pe.note}</p>}
+            {hasDemo(pe.exerciseId) && (
+              <details className="demo-details">
+                <summary>Voir le mouvement</summary>
+                <ExerciseDemo exerciseId={pe.exerciseId} traits={traits} />
+              </details>
+            )}
             {inputs[pe.exerciseId].map((s, i) => (
               <div key={i} className="setrow">
                 <span>Série {i + 1}</span>

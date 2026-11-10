@@ -24,6 +24,7 @@ The Solar Cam site itself is not started yet. The repo currently contains **`coa
 ### Testing
 
 - Vitest for unit tests; engine logic lives in `coach-app/src/engine` and must stay covered by tests (`engine.test.ts`)
+- Exercise demos are generated SVG animations (no photos/videos, no external assets). To add one: map the exercise id in `poses.ts` (`EXERCISE_MOVEMENT`) and add a `case` in `buildMovement`; tests check segment lengths and ground contact
 - Coaching rules are rule-based (no AI/backend yet); morphology thresholds are heuristics, not medical norms
 
 ## Project Structure
@@ -33,13 +34,16 @@ solarcammayotte-site/
 ├── CLAUDE.md          # This file — guidance for AI assistants
 └── coach-app/         # Coach Muscu — Vite + React + TypeScript PWA (French UI)
     ├── public/        # manifest, icon, service worker (offline)
+    ├── scripts/       # standalone.mjs: inlines the build into one HTML file
+    ├── standalone/    # coach-muscu.html — single-file build, opens by double-click (committed)
     └── src/
         ├── engine/    # Pure logic, unit-tested (no React)
         │   ├── morphology.ts  # ape index, femur/torso ratio -> traits + insights
         │   ├── exercises.ts   # exercise DB (equipment, injury stress, morphology fit)
         │   ├── program.ts     # split + exercise selection + sets/reps
-        │   └── coach.ts       # double progression, deload, volume adaptation, feedback
-        ├── ui/        # ProfileForm, Today (workout), Plan, History
+        │   ├── coach.ts       # double progression, deload, volume adaptation, feedback
+        │   └── poses.ts       # stick-figure skeleton (forward kinematics) + animated movement specs
+        ├── ui/        # ProfileForm, Today (workout), Plan, History, ExerciseDemo (animated SVG)
         ├── storage.ts # localStorage persistence (no backend)
         └── types.ts
 ```
@@ -54,6 +58,7 @@ Run from `coach-app/`:
 npm install        # Install dependencies
 npm run dev        # Start dev server
 npm run build      # Typecheck + production build
+npm run build:html # Build + regenerate standalone/coach-muscu.html (commit it)
 npm test           # Run unit tests (vitest)
 npm run typecheck  # tsc --noEmit
 ```
