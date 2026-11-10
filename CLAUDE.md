@@ -6,7 +6,7 @@ This is the website for **Solar Cam Mayotte** — a solar-powered camera project
 
 ## Repository Status
 
-This project is **newly initialized** and does not yet contain application code. The sections below should be updated as the project takes shape.
+The Solar Cam site itself is not started yet. The repo currently contains **`coach-app/`**, a separate bodybuilding coach PWA (see below). Move it to its own repository when one is available.
 
 ## Development Guidelines
 
@@ -23,29 +23,42 @@ This project is **newly initialized** and does not yet contain application code.
 
 ### Testing
 
-- Add tests alongside new features (update this section once a test framework is chosen)
+- Vitest for unit tests; engine logic lives in `coach-app/src/engine` and must stay covered by tests (`engine.test.ts`)
+- Coaching rules are rule-based (no AI/backend yet); morphology thresholds are heuristics, not medical norms
 
 ## Project Structure
 
 ```
 solarcammayotte-site/
 ├── CLAUDE.md          # This file — guidance for AI assistants
-└── (project files TBD)
+└── coach-app/         # Coach Muscu — Vite + React + TypeScript PWA (French UI)
+    ├── public/        # manifest, icon, service worker (offline)
+    └── src/
+        ├── engine/    # Pure logic, unit-tested (no React)
+        │   ├── morphology.ts  # ape index, femur/torso ratio -> traits + insights
+        │   ├── exercises.ts   # exercise DB (equipment, injury stress, morphology fit)
+        │   ├── program.ts     # split + exercise selection + sets/reps
+        │   └── coach.ts       # double progression, deload, volume adaptation, feedback
+        ├── ui/        # ProfileForm, Today (workout), Plan, History
+        ├── storage.ts # localStorage persistence (no backend)
+        └── types.ts
 ```
 
 > **Note:** Update this structure diagram as directories and files are added.
 
 ## Commands
 
-No build/dev commands configured yet. Update this section when a package manager and build tool are set up. Expected entries:
+Run from `coach-app/`:
 
 ```
-# Install dependencies
-# Start dev server
-# Build for production
-# Run tests
-# Lint / format
+npm install        # Install dependencies
+npm run dev        # Start dev server
+npm run build      # Typecheck + production build
+npm test           # Run unit tests (vitest)
+npm run typecheck  # tsc --noEmit
 ```
+
+No linter/formatter configured yet.
 
 ## Key Conventions
 
